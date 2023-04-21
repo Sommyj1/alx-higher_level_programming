@@ -6,36 +6,26 @@ and lists all cities of that state, using the database hbtn_0e_4_usa
 import MySQLdb
 import sys
 
-if __name__ == "__main__":
-    """
-    Access the database connection
-    """
-    username = sys.argv[1]
-    password = sys.argv[2]
-    database = sys.argv[3]
-    state_name = sys.argv[4]
+if __name__ == '__main__':
+    db = MySQLdb.connect(host='localhost',
+                         user=sys.argv[1],
+                         passwd=sys.argv[2],
+                         db=sys.argv[3],
+                         port=3306)
+    cursor = db.cursor()
+    query = """
+            SELECT cities.name
+            FROM cities
 
-    database_connection = MySQLdb.connect(
-
-            host="localhost",
-            user=username,
-            port=3306,
-            passwd=password,
-            db=database
-            )
-
-    cursor_obj = database_connection.cursor()
-    """Create the cursor object"""
-
-    sql = ("SELECT cities.name FROM cities INNER JOIN states \
-            ON cities.state_id = states.id WHERE states.name LIKE \
-            BINARY %s ORDER BY \
-            cities.id ASC")
-
-    cursor_obj.execute(sql, (state_name, ))
-    selected_rows = cursor_obj.fetchall()
-    print(*[row[0] for row in 
-
-selected_rows], sep=", ")
-    cursor_obj.close()
-    database_connection.close()
+            INNER JOIN states ON cities.state_id = states.id
+            WHERE states.name = '{}'
+            ORDER BY cities.id ASC;
+            """
+    cursor.execute(query.format(sys.argv[4]))
+    cities = cursor.fetchall()
+    city_names = []
+    for city in cities:
+        city_names.append(city[0])
+    print(", ".join(city_names))
+    cursor.close()
+    db.close()
