@@ -15,4 +15,4 @@ if __name__ == "__main__":
     url = argv[1]
     value = {"email": argv[2]}
     r = requests.post(url, data=value)
-    print(req.text)
+    print(r.text)
